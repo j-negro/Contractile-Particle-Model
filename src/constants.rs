@@ -18,14 +18,3 @@ pub fn calculate_desired_velocity(radius: f64) -> f64 {
     MAX_DESIRED_VELOCITY
         * ((radius - MIN_PARTICLE_RADIUS) / (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS)).powf(BETA)
 }
-
-use rand::Rng;
-pub fn get_target(x_coordinate: f64) -> (f64, f64) {
-    let x_min_target = TARGET_LEFT_X + 0.2 * TARGET_SIZE;
-    let x_max_target = TARGET_RIGHT_X + 0.8 * TARGET_SIZE;
-    if x_coordinate < x_min_target || x_coordinate > x_max_target {
-        let target_x = rand::thread_rng().gen_range(x_min_target..=x_max_target);
-        return (target_x, 0.0);
-    }
-    (x_coordinate, 0.0)
-}

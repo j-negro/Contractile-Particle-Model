@@ -16,21 +16,19 @@ impl Simulation {
         let mut particles = Vec::with_capacity(PARTICLE_COUNT);
         let mut rng = rand::thread_rng();
         // TODO: Validate issue with interaction range too small.
-        let mut neighbors_method = CellIndexMethod::new(SIMULATION_LENGHT, None, 1e-4, false);
+        let neighbors_method = CellIndexMethod::new(SIMULATION_LENGHT, None, 1e-4, false);
 
         for i in 0..PARTICLE_COUNT {
             loop {
                 let x = rng.gen_range(0.0..=SIMULATION_LENGHT);
                 let y = rng.gen_range(0.0..=SIMULATION_LENGHT);
                 let particle = Particle::new(i, x, y);
-                particles.push(particle);
 
-                neighbors_method.set_particles(particles.clone());
-                let neighbors = neighbors_method.calculate_neighbors();
-                if neighbors[i].len() == 1 {
-                    break;
+                if particles.iter().any(|p| particle.is_colliding(&p)) {
+                    continue;
                 }
-                particles.pop();
+
+                particles.push(particle);
             }
         }
 
