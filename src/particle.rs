@@ -56,6 +56,10 @@ impl Particle {
     pub fn check_wall_collisions(&self) -> Vec<(f64, f64)> {
         let mut wall_collisions = Vec::new();
 
+        if self.reached_first_target {
+            return wall_collisions;
+        }
+
         if self.x - self.radius <= 0.0 {
             wall_collisions.push((0.0, self.y));
         } else if self.x + self.radius >= SIMULATION_LENGHT {
@@ -81,17 +85,18 @@ impl Particle {
                 return true;
             } else {
                 self.target = (self.x, -3.0);
+                self.reached_first_target = true;
             }
         }
         false
     }
 
-    fn step(&mut self) {
+    pub fn step(&mut self) {
         self.x += self.vx;
         self.y += self.vy;
     }
 
-    pub fn step_escape(&mut self, collision_points: &[(f64, f64)]) {
+    pub fn update_escape(&mut self, collision_points: &[(f64, f64)]) {
         self.radius = MIN_PARTICLE_RADIUS;
 
         let mut collision_vector = (0.0, 0.0);
@@ -108,8 +113,6 @@ impl Particle {
 
         self.vx = MAX_DESIRED_VELOCITY * collision_vector.0 / norm;
         self.vy = MAX_DESIRED_VELOCITY * collision_vector.1 / norm;
-
-        self.step();
     }
 
     fn calculate_desired_velocity(radius: f64) -> f64 {
@@ -118,7 +121,7 @@ impl Particle {
                 .powf(BETA)
     }
 
-    pub fn step_desired(&mut self) {
+    pub fn update_desired(&mut self) {
         if self.radius < MAX_PARTICLE_RADIUS {
             self.radius += RADIUS_INCREMENT;
         }
@@ -130,8 +133,6 @@ impl Particle {
 
         self.vx = desired_velocity * target_direction.0 / target_norm;
         self.vy = desired_velocity * target_direction.1 / target_norm;
-
-        self.step();
     }
 
     pub fn get_velocities(&self) -> (f64, f64) {
