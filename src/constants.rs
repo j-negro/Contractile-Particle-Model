@@ -13,8 +13,3 @@ pub const BETA: f64 = 0.9;
 
 pub const TIME_STEP: f64 = MIN_PARTICLE_RADIUS / (2.0 * MAX_DESIRED_VELOCITY);
 pub const RADIUS_INCREMENT: f64 = MAX_PARTICLE_RADIUS / (0.5 / TIME_STEP);
-
-pub fn calculate_desired_velocity(radius: f64) -> f64 {
-    MAX_DESIRED_VELOCITY
-        * ((radius - MIN_PARTICLE_RADIUS) / (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS)).powf(BETA)
-}

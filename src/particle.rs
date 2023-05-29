@@ -1,6 +1,6 @@
 use crate::constants::{
-    calculate_desired_velocity, MAX_DESIRED_VELOCITY, MAX_PARTICLE_RADIUS, MIN_PARTICLE_RADIUS,
-    RADIUS_INCREMENT, TARGET_LEFT_X, TARGET_RIGHT_X, TARGET_SIZE,
+    BETA, MAX_DESIRED_VELOCITY, MAX_PARTICLE_RADIUS, MIN_PARTICLE_RADIUS, RADIUS_INCREMENT,
+    SIMULATION_LENGHT, TARGET_LEFT_X, TARGET_RIGHT_X, TARGET_SIZE,
 };
 use neighbors::Particle as MethodParticle;
 use rand::Rng;
@@ -51,6 +51,24 @@ impl Particle {
         (x_coordinate, 0.0)
     }
 
+    pub fn check_wall_collisions(&self) -> Vec<(f64, f64)> {
+        let mut wall_collisions = Vec::new();
+
+        if self.x - self.radius <= 0.0 {
+            wall_collisions.push((0.0, self.y));
+        } else if self.x + self.radius >= SIMULATION_LENGHT {
+            wall_collisions.push((SIMULATION_LENGHT, self.y));
+        }
+
+        if self.y - self.radius <= 0.0 {
+            wall_collisions.push((self.x, 0.0));
+        } else if self.y + self.radius >= SIMULATION_LENGHT {
+            wall_collisions.push((self.x, SIMULATION_LENGHT));
+        }
+
+        wall_collisions
+    }
+
     fn step(&mut self) {
         self.x += self.vx;
         self.y += self.vy;
@@ -77,12 +95,18 @@ impl Particle {
         self.step();
     }
 
+    fn calculate_desired_velocity(radius: f64) -> f64 {
+        MAX_DESIRED_VELOCITY
+            * ((radius - MIN_PARTICLE_RADIUS) / (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS))
+                .powf(BETA)
+    }
+
     pub fn step_desired(&mut self) {
         if self.radius < MAX_PARTICLE_RADIUS {
             self.radius += RADIUS_INCREMENT;
         }
 
-        let desired_velocity = calculate_desired_velocity(self.radius);
+        let desired_velocity = Self::calculate_desired_velocity(self.radius);
 
         let target_direction = (self.target.0 - self.x, self.target.1 - self.y);
         let target_norm = (target_direction.0.powi(2) + target_direction.1.powi(2)).sqrt();
