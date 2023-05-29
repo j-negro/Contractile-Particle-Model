@@ -1,4 +1,4 @@
-use neighbors::{cell_index_method::CellIndexMethod, NeighborMethod};
+use neighbors::{cell_index_method::CellIndexMethod, NeighborMethod, Particle as MethodParticle};
 use rand::Rng;
 
 use crate::{
@@ -36,6 +36,29 @@ impl Simulation {
         Simulation {
             particles,
             neighbors_method,
+        }
+    }
+
+    pub fn run(&mut self, steps: usize) {
+        for _ in 0..steps {
+            self.neighbors_method.set_particles(self.particles.clone());
+            let neighbors = self.neighbors_method.calculate_neighbors();
+
+            for particle in &mut self.particles {
+                let mut collisions_points = particle.check_wall_collisions();
+
+                if neighbors[particle.id].is_empty() && collisions_points.is_empty() {
+                    particle.step_desired();
+                } else {
+                    collisions_points.append(
+                        &mut neighbors[particle.id]
+                            .iter()
+                            .map(|p| p.get_coordinates())
+                            .collect(),
+                    );
+                    particle.step_escape(&collisions_points);
+                }
+            }
         }
     }
 }
