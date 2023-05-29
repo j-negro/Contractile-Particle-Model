@@ -16,7 +16,7 @@ impl Simulation {
         let mut particles = Vec::with_capacity(PARTICLE_COUNT);
         let mut rng = rand::thread_rng();
         // TODO: Validate issue with interaction range too small.
-        let neighbors_method = CellIndexMethod::new(SIMULATION_LENGHT, None, 1e-4, false);
+        let neighbors_method = CellIndexMethod::new(SIMULATION_LENGHT, Some(20), 0.0, false);
 
         for i in 0..PARTICLE_COUNT {
             loop {
