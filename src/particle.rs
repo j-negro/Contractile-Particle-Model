@@ -116,6 +116,10 @@ impl Particle {
 
         self.step();
     }
+
+    pub fn get_velocities(&self) -> (f64, f64) {
+        (self.vx, self.vy)
+    }
 }
 
 impl MethodParticle for Particle {
