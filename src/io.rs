@@ -17,6 +17,11 @@ const CORNERS: [(f64, f64); 4] = [
 pub fn output_simulation(file: &File, particles: &Vec<Particle>) -> Result<()> {
     let mut writer = BufWriter::new(file);
 
+    let particles = particles
+        .iter()
+        .filter(|p| !p.reached_first_target)
+        .collect::<Vec<_>>();
+
     let particle_count = particles.len() + CORNERS.len();
     writeln!(writer, "{particle_count}")?;
     writeln!(writer, "Properties=pos:R:2:velo:R:2:radius:R:1 pbc=\"F F\"",)?;
