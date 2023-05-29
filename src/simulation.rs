@@ -29,6 +29,7 @@ impl Simulation {
                 }
 
                 particles.push(particle);
+                break;
             }
         }
 
