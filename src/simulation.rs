@@ -16,7 +16,7 @@ impl Simulation {
         let mut particles = Vec::with_capacity(PARTICLE_COUNT);
         let mut rng = rand::thread_rng();
         // TODO: Validate issue with interaction range too small.
-        let neighbors_method = CellIndexMethod::new(SIMULATION_LENGHT, Some(20), 0.0, false);
+        let neighbors_method = CellIndexMethod::new(SIMULATION_LENGHT + 3.0, Some(23), 0.0, false);
 
         for i in 0..PARTICLE_COUNT {
             loop {
@@ -43,8 +43,9 @@ impl Simulation {
         for _ in 0..steps {
             self.neighbors_method.set_particles(self.particles.clone());
             let neighbors = self.neighbors_method.calculate_neighbors();
+            let mut to_remove = Vec::new();
 
-            for particle in &mut self.particles {
+            for (idx, particle) in self.particles.iter_mut().enumerate() {
                 let mut collisions_points = particle.check_wall_collisions();
 
                 if neighbors[particle.id].is_empty() && collisions_points.is_empty() {
@@ -58,6 +59,14 @@ impl Simulation {
                     );
                     particle.step_escape(&collisions_points);
                 }
+
+                if particle.check_reached_target() {
+                    to_remove.push(idx);
+                }
+            }
+
+            for idx in to_remove {
+                self.particles.remove(idx);
             }
         }
     }

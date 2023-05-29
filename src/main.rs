@@ -17,8 +17,8 @@ fn main() -> Result<()> {
     let file = File::create("simulation.xyz")?;
     io::output_simulation(&file, &simulation.particles)?;
 
-    for _ in 1..=100 {
-        simulation.run(100);
+    for _ in 1..=10 {
+        simulation.run(1);
 
         io::output_simulation(&file, &simulation.particles)?;
     }

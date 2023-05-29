@@ -15,6 +15,7 @@ pub struct Particle {
     pub vy: f64,
     pub radius: f64,
     pub target: (f64, f64),
+    pub reached_first_target: bool,
 }
 
 impl Particle {
@@ -27,18 +28,19 @@ impl Particle {
             vy: 0.0,
             radius: MIN_PARTICLE_RADIUS,
             target: Self::get_target(x),
+            reached_first_target: false,
         }
     }
 
-    fn distance(&self, other: &Particle) -> f64 {
-        let dx = self.x - other.x;
-        let dy = self.y - other.y;
+    fn distance(&self, other: (f64, f64)) -> f64 {
+        let dx = self.x - other.0;
+        let dy = self.y - other.1;
 
         (dx.powi(2) + dy.powi(2)).sqrt()
     }
 
     pub fn is_colliding(&self, other: &Particle) -> bool {
-        self.distance(other) <= self.radius + other.radius
+        self.distance(other.get_coordinates()) <= self.radius + other.radius
     }
 
     fn get_target(x_coordinate: f64) -> (f64, f64) {
@@ -67,6 +69,21 @@ impl Particle {
         }
 
         wall_collisions
+    }
+
+    pub fn check_reached_target(&mut self) -> bool {
+        // Check if the particle has reached the first or second target.
+        // If the particle has reached the first target, update the target
+        // to the second target and return false.
+        // If the particle has reached the second target, return true.
+        if self.distance(self.target) <= self.radius {
+            if self.reached_first_target {
+                return true;
+            } else {
+                self.target = (self.x, -3.0);
+            }
+        }
+        false
     }
 
     fn step(&mut self) {
