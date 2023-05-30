@@ -2,7 +2,6 @@ use crate::constants::{
     BETA, MAX_DESIRED_VELOCITY, MAX_PARTICLE_RADIUS, MIN_PARTICLE_RADIUS, RADIUS_INCREMENT,
     SIMULATION_LENGHT, TARGET_LEFT_X, TARGET_RIGHT_X, TARGET_SIZE,
 };
-use neighbors::Particle as MethodParticle;
 use rand::Rng;
 use std::hash::Hash;
 
@@ -138,32 +137,12 @@ impl Particle {
     pub fn get_velocities(&self) -> (f64, f64) {
         (self.vx, self.vy)
     }
-}
 
-impl MethodParticle for Particle {
-    fn get_id(&self) -> u32 {
-        self.id as u32
-    }
-
-    fn get_coordinates(&self) -> (f64, f64) {
+    pub fn get_coordinates(&self) -> (f64, f64) {
         (self.x, self.y)
     }
 
-    fn get_radius(&self) -> f64 {
+    pub fn get_radius(&self) -> f64 {
         self.radius
-    }
-}
-
-impl PartialEq for Particle {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl Eq for Particle {}
-
-impl Hash for Particle {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
     }
 }

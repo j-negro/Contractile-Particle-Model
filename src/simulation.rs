@@ -1,4 +1,3 @@
-use neighbors::Particle as MethodParticle;
 use rand::Rng;
 
 use crate::{
@@ -60,7 +59,7 @@ impl Simulation {
             for (idx, particle) in self.particles.iter_mut().enumerate() {
                 let mut collisions_points = particle.check_wall_collisions();
 
-                let neighbors_coords = neighbors[idx].1.clone();
+                let neighbors_coords = &neighbors[idx].1;
 
                 if neighbors_coords.is_empty() && collisions_points.is_empty() {
                     particle.update_desired();

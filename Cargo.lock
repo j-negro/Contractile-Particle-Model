@@ -19,7 +19,6 @@ name = "contractile-particle-model"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "neighbors",
  "rand",
 ]
 
@@ -39,11 +38,6 @@ name = "libc"
 version = "0.2.144"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b00cc1c228a6782d0f076e7b232802e0c5689d41bb5df366f2a6b6621cfdfe1"
-
-[[package]]
-name = "neighbors"
-version = "0.1.0"
-source = "git+https://github.com/j-negro/cell-index-method?tag=v1.0.1#440d544fabce2003e67ee8b936124e90565ffdfc"
 
 [[package]]
 name = "ppv-lite86"

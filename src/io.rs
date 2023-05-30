@@ -3,8 +3,6 @@ use std::{
     io::{BufWriter, Write},
 };
 
-use neighbors::Particle as MethodParticle;
-
 use crate::{constants::SIMULATION_LENGHT, particle::Particle, Result};
 
 const CORNERS: [(f64, f64); 4] = [

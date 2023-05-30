@@ -10,8 +10,6 @@ mod particle;
 mod simulation;
 
 fn main() -> Result<()> {
-    println!("Hello, world!");
-
     let mut simulation = Simulation::new();
 
     let file = File::create("simulation.xyz")?;
