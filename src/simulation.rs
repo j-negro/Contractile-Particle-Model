@@ -36,40 +36,37 @@ impl Simulation {
 
     pub fn run(&mut self, steps: usize) {
         for _ in 0..steps {
-            let mut neighbors = Vec::new();
+            let mut collisions = Vec::new();
 
+            // NOTE: Calculate wall collisions
             for particle in &self.particles {
-                neighbors.push((particle.id, Vec::new()));
+                collisions.push(particle.check_wall_collisions());
             }
 
+            // NOTE: Calculate particle collisions
             for i in 0..self.particles.len() {
                 for j in i + 1..self.particles.len() {
                     if self.particles[i].is_colliding(&self.particles[j]) {
                         let particle_coords = self.particles[i].get_coordinates();
-                        let neighbor_coords = self.particles[j].get_coordinates();
+                        let colliding_coords = self.particles[j].get_coordinates();
 
-                        neighbors[i].1.push(neighbor_coords);
-                        neighbors[j].1.push(particle_coords);
+                        collisions[i].push(colliding_coords);
+                        collisions[j].push(particle_coords);
                     }
                 }
             }
 
-            let mut to_remove = Vec::new();
-
+            // NOTE: Update velocity and radius
             for (idx, particle) in self.particles.iter_mut().enumerate() {
-                let mut collisions_points = particle.check_wall_collisions();
-
-                let neighbors_coords = &neighbors[idx].1;
-
-                if neighbors_coords.is_empty() && collisions_points.is_empty() {
+                if collisions[idx].is_empty() {
                     particle.update_desired();
                 } else {
-                    collisions_points.extend(neighbors_coords);
-
-                    particle.update_escape(&collisions_points);
+                    particle.update_escape(&collisions[idx]);
                 }
             }
 
+            // NOTE: Step particles forward
+            let mut to_remove = Vec::new();
             for particle in self.particles.iter_mut() {
                 particle.step();
                 if particle.check_reached_target() {
@@ -77,6 +74,7 @@ impl Simulation {
                 }
             }
 
+            // NOTE: Remove particles that reached its target
             self.particles.retain(|p| !to_remove.contains(&p.id));
         }
     }
