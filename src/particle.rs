@@ -1,9 +1,8 @@
 use crate::constants::{
     BETA, MAX_DESIRED_VELOCITY, MAX_PARTICLE_RADIUS, MIN_PARTICLE_RADIUS, RADIUS_INCREMENT,
-    SIMULATION_LENGHT, TARGET_LEFT_X, TARGET_RIGHT_X, TARGET_SIZE,
+    SIMULATION_LENGHT, TARGET_LEFT_X, TARGET_RIGHT_X, TARGET_SIZE, TIME_STEP,
 };
 use rand::Rng;
-use std::hash::Hash;
 
 #[derive(Debug, Clone)]
 pub struct Particle {
