@@ -90,8 +90,8 @@ impl Particle {
     }
 
     pub fn step(&mut self) {
-        self.x += self.vx;
-        self.y += self.vy;
+        self.x += self.vx * TIME_STEP;
+        self.y += self.vy * TIME_STEP;
     }
 
     pub fn update_escape(&mut self, collision_points: &[(f64, f64)]) {
