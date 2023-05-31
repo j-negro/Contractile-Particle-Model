@@ -1,6 +1,6 @@
 use crate::constants::{
     BETA, MAX_DESIRED_VELOCITY, MAX_PARTICLE_RADIUS, MIN_PARTICLE_RADIUS, RADIUS_INCREMENT,
-    SIMULATION_LENGHT, TARGET_LEFT_X, TARGET_RIGHT_X, TARGET_SIZE, TIME_STEP,
+    SIMULATION_LENGHT, TARGET_LEFT_X, TARGET_SIZE, TIME_STEP,
 };
 use rand::Rng;
 
@@ -43,7 +43,7 @@ impl Particle {
 
     fn get_target(x_coordinate: f64) -> (f64, f64) {
         let x_min_target = TARGET_LEFT_X + 0.2 * TARGET_SIZE;
-        let x_max_target = TARGET_RIGHT_X + 0.8 * TARGET_SIZE;
+        let x_max_target = TARGET_LEFT_X + 0.8 * TARGET_SIZE;
         if x_coordinate < x_min_target || x_coordinate > x_max_target {
             let target_x = rand::thread_rng().gen_range(x_min_target..=x_max_target);
             return (target_x, 0.0);
