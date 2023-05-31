@@ -84,10 +84,9 @@ impl Particle {
         if self.distance(self.target) <= self.radius {
             if self.reached_first_target {
                 return true;
-            } else {
-                self.target = (self.x, -3.0);
-                self.reached_first_target = true;
             }
+            self.target = (self.x, -3.0);
+            self.reached_first_target = true;
         } else if !self.reached_first_target {
             self.target = Self::get_target(self.x);
         }

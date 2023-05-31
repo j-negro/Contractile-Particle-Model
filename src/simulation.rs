@@ -22,7 +22,7 @@ impl Simulation {
                     rng.gen_range(MIN_PARTICLE_RADIUS..=(SIMULATION_LENGHT - MIN_PARTICLE_RADIUS));
                 let particle = Particle::new(i, x, y);
 
-                if particles.iter().any(|p| particle.is_colliding(&p)) {
+                if particles.iter().any(|p| particle.is_colliding(p)) {
                     continue;
                 }
 
@@ -67,7 +67,7 @@ impl Simulation {
 
             // NOTE: Step particles forward
             let mut to_remove = Vec::new();
-            for particle in self.particles.iter_mut() {
+            for particle in &mut self.particles {
                 particle.step();
 
                 let second_target_reached = particle.update_target();
