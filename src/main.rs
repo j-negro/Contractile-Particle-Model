@@ -16,7 +16,7 @@ fn main() -> Result<()> {
     io::output_simulation(&file, &simulation.particles)?;
 
     for _ in 1..=1000 {
-        simulation.run(100);
+        simulation.run(1);
 
         io::output_simulation(&file, &simulation.particles)?;
     }

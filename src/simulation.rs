@@ -69,7 +69,9 @@ impl Simulation {
             let mut to_remove = Vec::new();
             for particle in self.particles.iter_mut() {
                 particle.step();
-                if particle.check_reached_target() {
+
+                let second_target_reached = particle.update_target();
+                if second_target_reached {
                     to_remove.push(particle.id);
                 }
             }

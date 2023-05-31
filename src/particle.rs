@@ -73,11 +73,14 @@ impl Particle {
         wall_collisions
     }
 
-    pub fn check_reached_target(&mut self) -> bool {
-        // Check if the particle has reached the first or second target.
-        // If the particle has reached the first target, update the target
-        // to the second target and return false.
-        // If the particle has reached the second target, return true.
+    /// Updates the target for the particle
+    ///
+    /// If the particle hasn't reached any target, then it will be updated as it was created the first time
+    ///
+    /// If the first target is reached, then the target is updated to point to the second target
+    ///
+    /// If the second target is reached, then it returns true and the simulation for this particle is finished
+    pub fn update_target(&mut self) -> bool {
         if self.distance(self.target) <= self.radius {
             if self.reached_first_target {
                 return true;
@@ -85,6 +88,8 @@ impl Particle {
                 self.target = (self.x, -3.0);
                 self.reached_first_target = true;
             }
+        } else if !self.reached_first_target {
+            self.target = Self::get_target(self.x);
         }
         false
     }
