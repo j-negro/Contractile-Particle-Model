@@ -19,6 +19,12 @@ pub struct Particle {
     reached_first_target: bool,
 }
 
+pub enum TargetType {
+    None,
+    FirstTarget,
+    SecondTarget,
+}
+
 impl Particle {
     pub fn new(id: usize, x: f64, y: f64, target: &Target) -> Particle {
         let mut particle = Particle {
@@ -85,16 +91,17 @@ impl Particle {
     ///
     /// If the first target is reached, then the target is updated to point to the second target
     ///
-    /// If the second target is reached, then it returns true and the simulation for this particle is finished
-    pub fn check_reached_target(&mut self) -> bool {
+    /// If the second target is reached the simulation for this particle is finished
+    pub fn check_reached_target(&mut self) -> TargetType {
         if self.distance(self.target) <= self.radius {
             if self.reached_first_target {
-                return true;
+                return TargetType::SecondTarget;
             }
             self.target = (self.x, -3.0);
             self.reached_first_target = true;
+            return TargetType::FirstTarget;
         }
-        false
+        TargetType::None
     }
 
     pub fn step(&mut self) {

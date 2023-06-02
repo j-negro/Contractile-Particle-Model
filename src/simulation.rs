@@ -1,14 +1,15 @@
 use rand::Rng;
 
 use crate::{
-    constants::{MIN_PARTICLE_RADIUS, SIMULATION_LENGHT},
-    particle::Particle,
+    constants::{MIN_PARTICLE_RADIUS, SIMULATION_LENGHT, TIME_STEP},
+    particle::{Particle, TargetType},
     target::Target,
 };
 
 pub struct Simulation {
     pub particles: Vec<Particle>,
     pub target: Target,
+    time: f64,
 }
 
 impl Simulation {
@@ -35,11 +36,19 @@ impl Simulation {
             }
         }
 
-        Simulation { particles, target }
+        Simulation {
+            particles,
+            target,
+            time: 0.0,
+        }
     }
 
-    pub fn run(&mut self, steps: usize) {
+    pub fn run(&mut self, steps: usize) -> Vec<(f64, usize)> {
+        let mut exit_particles = Vec::with_capacity(steps);
+
         for _ in 0..steps {
+            self.time += TIME_STEP;
+
             let mut collisions = Vec::new();
 
             // NOTE: Calculate wall collisions
@@ -72,17 +81,23 @@ impl Simulation {
 
             // NOTE: Step particles forward
             let mut to_remove = Vec::new();
+            let mut first_target_hits = 0;
             for particle in &mut self.particles {
                 particle.step();
 
-                let second_target_reached = particle.check_reached_target();
-                if second_target_reached {
-                    to_remove.push(particle.id);
+                match particle.check_reached_target() {
+                    TargetType::None => {}
+                    TargetType::FirstTarget => first_target_hits += 1,
+                    TargetType::SecondTarget => to_remove.push(particle.id),
                 }
             }
-
+            if first_target_hits > 0 {
+                exit_particles.push((self.time, first_target_hits));
+            }
             // NOTE: Remove particles that reached its target
             self.particles.retain(|p| !to_remove.contains(&p.id));
         }
+
+        exit_particles
     }
 }
