@@ -1,6 +1,6 @@
 use crate::constants::{
     BETA, MAX_DESIRED_VELOCITY, MAX_PARTICLE_RADIUS, MIN_PARTICLE_RADIUS, RADIUS_INCREMENT,
-    SIMULATION_LENGHT, TARGET_LEFT_X, TARGET_SIZE, TIME_STEP,
+    SIMULATION_LENGHT, TIME_STEP, X_MAX_TARGET, X_MIN_TARGET,
 };
 use rand::Rng;
 
@@ -18,16 +18,20 @@ pub struct Particle {
 
 impl Particle {
     pub fn new(id: usize, x: f64, y: f64) -> Particle {
-        Particle {
+        let mut particle = Particle {
             id,
             x,
             y,
             vx: 0.0,
             vy: 0.0,
             radius: MIN_PARTICLE_RADIUS,
-            target: Self::get_target(x),
+            target: (0.0, 0.0),
             reached_first_target: false,
-        }
+        };
+
+        particle.update_target();
+
+        particle
     }
 
     fn distance(&self, other: (f64, f64)) -> f64 {
@@ -41,14 +45,15 @@ impl Particle {
         self.distance(other.get_coordinates()) <= self.radius + other.radius
     }
 
-    fn get_target(x_coordinate: f64) -> (f64, f64) {
-        let x_min_target = TARGET_LEFT_X + 0.2 * TARGET_SIZE;
-        let x_max_target = TARGET_LEFT_X + 0.8 * TARGET_SIZE;
-        if x_coordinate < x_min_target || x_coordinate > x_max_target {
-            let target_x = rand::thread_rng().gen_range(x_min_target..=x_max_target);
-            return (target_x, 0.0);
+    pub fn update_target(&mut self) {
+        if !self.reached_first_target {
+            if self.x < X_MIN_TARGET || self.x > X_MAX_TARGET {
+                let target_x = rand::thread_rng().gen_range(X_MIN_TARGET..=X_MAX_TARGET);
+                self.target = (target_x, 0.0);
+            } else {
+                self.target = (self.x, 0.0);
+            }
         }
-        (x_coordinate, 0.0)
     }
 
     pub fn check_wall_collisions(&self) -> Vec<(f64, f64)> {
@@ -73,22 +78,18 @@ impl Particle {
         wall_collisions
     }
 
-    /// Updates the target for the particle
-    ///
-    /// If the particle hasn't reached any target, then it will be updated as it was created the first time
+    /// Checks if the first or second target is reached
     ///
     /// If the first target is reached, then the target is updated to point to the second target
     ///
     /// If the second target is reached, then it returns true and the simulation for this particle is finished
-    pub fn update_target(&mut self) -> bool {
+    pub fn check_reached_target(&mut self) -> bool {
         if self.distance(self.target) <= self.radius {
             if self.reached_first_target {
                 return true;
             }
             self.target = (self.x, -3.0);
             self.reached_first_target = true;
-        } else if !self.reached_first_target {
-            self.target = Self::get_target(self.x);
         }
         false
     }

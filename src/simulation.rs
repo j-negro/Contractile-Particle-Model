@@ -62,6 +62,7 @@ impl Simulation {
                     particle.update_desired();
                 } else {
                     particle.update_escape(&collisions[idx]);
+                    particle.update_target();
                 }
             }
 
@@ -70,7 +71,7 @@ impl Simulation {
             for particle in &mut self.particles {
                 particle.step();
 
-                let second_target_reached = particle.update_target();
+                let second_target_reached = particle.check_reached_target();
                 if second_target_reached {
                     to_remove.push(particle.id);
                 }
