@@ -29,7 +29,7 @@ fn main() -> Result<()> {
 
         io::output_simulation(&file, &simulation.particles, &simulation.target)?;
 
-        if simulation.particles.len() == 0 {
+        if simulation.particles.is_empty() {
             break;
         }
 
