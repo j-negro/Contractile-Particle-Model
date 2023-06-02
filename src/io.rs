@@ -3,22 +3,16 @@ use std::{
     io::{BufWriter, Write},
 };
 
-use crate::{
-    constants::{SIMULATION_LENGHT, TARGET_LEFT_X, TARGET_RIGHT_X},
-    particle::Particle,
-    Result,
-};
+use crate::{constants::SIMULATION_LENGHT, particle::Particle, target::Target, Result};
 
-const CORNERS: [(f64, f64); 6] = [
+const CORNERS: [(f64, f64); 4] = [
     (0.0, 0.0),
     (SIMULATION_LENGHT, 0.0),
     (0.0, SIMULATION_LENGHT),
     (SIMULATION_LENGHT, SIMULATION_LENGHT),
-    (TARGET_LEFT_X, 0.0),
-    (TARGET_RIGHT_X, 0.0),
 ];
 
-pub fn output_simulation(file: &File, particles: &Vec<Particle>) -> Result<()> {
+pub fn output_simulation(file: &File, particles: &Vec<Particle>, target: &Target) -> Result<()> {
     let mut writer = BufWriter::new(file);
 
     let particle_count = particles.len() + CORNERS.len();
@@ -45,6 +39,11 @@ pub fn output_simulation(file: &File, particles: &Vec<Particle>) -> Result<()> {
     for corner in &CORNERS {
         writeln!(writer, "{:.12} {:.12} 0 0 0.05", corner.0, corner.1)?;
     }
+
+    // NOTE: Write the target
+    writeln!(writer, "{:.12} {:.12} 0 0 0.05", target.left, 0.0)?;
+
+    writeln!(writer, "{:.12} {:.12} 0 0 0.05", target.right, 0.0)?;
 
     Ok(())
 }

@@ -1,23 +1,26 @@
-use crate::constants::{
-    BETA, MAX_DESIRED_VELOCITY, MAX_PARTICLE_RADIUS, MIN_PARTICLE_RADIUS, RADIUS_INCREMENT,
-    SIMULATION_LENGHT, TIME_STEP, X_MAX_TARGET, X_MIN_TARGET,
+use crate::{
+    constants::{
+        BETA, MAX_DESIRED_VELOCITY, MAX_PARTICLE_RADIUS, MIN_PARTICLE_RADIUS, RADIUS_INCREMENT,
+        SIMULATION_LENGHT, TIME_STEP,
+    },
+    target::Target,
 };
 use rand::Rng;
 
 #[derive(Debug, Clone)]
 pub struct Particle {
     pub id: usize,
-    pub x: f64,
-    pub y: f64,
-    pub vx: f64,
-    pub vy: f64,
-    pub radius: f64,
-    pub target: (f64, f64),
-    pub reached_first_target: bool,
+    x: f64,
+    y: f64,
+    vx: f64,
+    vy: f64,
+    radius: f64,
+    target: (f64, f64),
+    reached_first_target: bool,
 }
 
 impl Particle {
-    pub fn new(id: usize, x: f64, y: f64) -> Particle {
+    pub fn new(id: usize, x: f64, y: f64, target: &Target) -> Particle {
         let mut particle = Particle {
             id,
             x,
@@ -29,7 +32,7 @@ impl Particle {
             reached_first_target: false,
         };
 
-        particle.update_target();
+        particle.update_target(target);
 
         particle
     }
@@ -45,10 +48,10 @@ impl Particle {
         self.distance(other.get_coordinates()) <= self.radius + other.radius
     }
 
-    pub fn update_target(&mut self) {
+    pub fn update_target(&mut self, target: &Target) {
         if !self.reached_first_target {
-            if self.x < X_MIN_TARGET || self.x > X_MAX_TARGET {
-                let target_x = rand::thread_rng().gen_range(X_MIN_TARGET..=X_MAX_TARGET);
+            if self.x < target.min || self.x > target.max {
+                let target_x = rand::thread_rng().gen_range(target.min..=target.max);
                 self.target = (target_x, 0.0);
             } else {
                 self.target = (self.x, 0.0);

@@ -1,26 +1,30 @@
 use rand::Rng;
 
 use crate::{
-    constants::{MIN_PARTICLE_RADIUS, PARTICLE_COUNT, SIMULATION_LENGHT},
+    constants::{MIN_PARTICLE_RADIUS, SIMULATION_LENGHT},
     particle::Particle,
+    target::Target,
 };
 
 pub struct Simulation {
     pub particles: Vec<Particle>,
+    pub target: Target,
 }
 
 impl Simulation {
-    pub fn new() -> Simulation {
-        let mut particles = Vec::with_capacity(PARTICLE_COUNT);
+    pub fn new(particle_count: usize, target_size: f64) -> Simulation {
+        let mut particles = Vec::with_capacity(particle_count);
         let mut rng = rand::thread_rng();
 
-        for i in 0..PARTICLE_COUNT {
+        let target = Target::new(target_size);
+
+        for i in 0..particle_count {
             loop {
                 let x =
                     rng.gen_range(MIN_PARTICLE_RADIUS..=(SIMULATION_LENGHT - MIN_PARTICLE_RADIUS));
                 let y =
                     rng.gen_range(MIN_PARTICLE_RADIUS..=(SIMULATION_LENGHT - MIN_PARTICLE_RADIUS));
-                let particle = Particle::new(i, x, y);
+                let particle = Particle::new(i, x, y, &target);
 
                 if particles.iter().any(|p| particle.is_colliding(p)) {
                     continue;
@@ -31,7 +35,7 @@ impl Simulation {
             }
         }
 
-        Simulation { particles }
+        Simulation { particles, target }
     }
 
     pub fn run(&mut self, steps: usize) {
@@ -62,7 +66,7 @@ impl Simulation {
                     particle.update_desired();
                 } else {
                     particle.update_escape(&collisions[idx]);
-                    particle.update_target();
+                    particle.update_target(&self.target);
                 }
             }
 
