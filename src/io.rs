@@ -47,7 +47,7 @@ pub fn output_simulation(file: &File, particles: &Vec<Particle>, target: &Target
     Ok(())
 }
 
-pub fn output_times(path: &str, times: &Vec<(f64, usize)>) -> Result<()> {
+pub fn output_times(path: &str, times: &Vec<(usize, f64)>) -> Result<()> {
     let file = File::create(path)?;
 
     let mut writer = BufWriter::new(file);

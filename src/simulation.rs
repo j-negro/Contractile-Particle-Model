@@ -10,6 +10,7 @@ pub struct Simulation {
     pub particles: Vec<Particle>,
     pub target: Target,
     time: f64,
+    out_particles: usize,
 }
 
 impl Simulation {
@@ -40,10 +41,11 @@ impl Simulation {
             particles,
             target,
             time: 0.0,
+            out_particles: 0,
         }
     }
 
-    pub fn run(&mut self, steps: usize) -> Vec<(f64, usize)> {
+    pub fn run(&mut self, steps: usize) -> Vec<(usize, f64)> {
         let mut exit_particles = Vec::with_capacity(steps);
 
         for _ in 0..steps {
@@ -91,9 +93,11 @@ impl Simulation {
                     TargetType::SecondTarget => to_remove.push(particle.id),
                 }
             }
-            if first_target_hits > 0 {
-                exit_particles.push((self.time, first_target_hits));
+            for _ in 0..first_target_hits {
+                self.out_particles += 1;
+                exit_particles.push((self.out_particles, self.time));
             }
+
             // NOTE: Remove particles that reached its target
             self.particles.retain(|p| !to_remove.contains(&p.id));
         }

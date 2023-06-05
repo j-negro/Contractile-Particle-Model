@@ -7,6 +7,8 @@ RESULTS_PATH = "./analysis/figs/"
 
 DIR = "./analysis/data/"
 
+DELTA_TIME = 5
+
 
 def read_position_data():
     data: dict[int, dict[float, list[list[float]]]] = {}
@@ -22,7 +24,10 @@ def read_position_data():
             N = int(filename[1])
 
             if N not in data.keys():
-                data[N] = []
+                data[N] = {
+                    "times": [],
+                    "particles": [],
+                }
 
             times = []
             counts = []
@@ -31,32 +36,76 @@ def read_position_data():
             with open(DIR + file, "r") as f:
                 for line in f:
                     splits = line.split(" ")
-                    times.append(float(splits[0]))
-                    counts.append(int(splits[1]))
+                    counts.append(int(splits[0]))
+                    times.append(float(splits[1]))
 
-            data[N].append(
-                {
-                    "times": times,
-                    "counts": counts,
-                }
-            )
+            data[N]["times"].append(times)
+            data[N]["particles"] = counts
 
-    print(data[200])
     return data
 
 
 def plot():
     data = read_position_data()
 
-    fig = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
+    fig1 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
     plt.ylabel("Tiempo (s)")
     plt.xlabel("Particulas")
 
-    plt.plot(data[200][0]["counts"], data[200][0]["times"])
+    plt.plot(data[200]["particles"], data[200]["times"][0])
 
-    fig.savefig(RESULTS_PATH + "removed_times.png")
+    fig1.savefig(RESULTS_PATH + "removed_times.png")
+
+    fig2 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams.update({"font.size": 16})
+    plt.ylabel("Particulas")
+    plt.xlabel("Tiempo (s)")
+
+    mean_times = np.mean(data[200]["times"], axis=0)
+    std_times = np.std(data[200]["times"], axis=0)
+
+    plt.errorbar(
+        mean_times,
+        data[200]["particles"],
+        xerr=std_times,
+        fmt="bx",
+        ecolor="r",
+        capsize=5,
+    )
+
+    fig2.savefig(RESULTS_PATH + "avergage_times.png")
+
+    fig3 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams.update({"font.size": 16})
+    plt.ylabel("Caudal")
+    plt.xlabel("Tiempo (s)")
+
+    Q = []
+    for time in range(int(mean_times[-1]) - DELTA_TIME):
+        start_idx = -1
+        end_idx = -1
+        for j in range(len(mean_times)):
+            if start_idx == -1 and mean_times[j] > time:
+                start_idx = j
+
+            if mean_times[j] > time + DELTA_TIME:
+                end_idx = j - 1
+                break
+
+        delta_particles = (
+            data[200]["particles"][end_idx] - data[200]["particles"][start_idx]
+        )
+        Q.append(delta_particles / DELTA_TIME)
+
+    times = [i + DELTA_TIME / 2 for i in range(int(mean_times[-1]) - DELTA_TIME)]
+
+    plt.scatter(times, Q)
+
+    fig3.savefig(RESULTS_PATH + "caudal.png")
 
     plt.show()
 
