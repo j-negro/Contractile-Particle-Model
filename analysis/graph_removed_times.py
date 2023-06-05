@@ -23,8 +23,8 @@ def read_position_data():
             d = float(filename[0])
             N = int(filename[1])
 
-            if N not in data.keys():
-                data[N] = {
+            if (N, d) not in data.keys():
+                data[(N, d)] = {
                     "times": [],
                     "particles": [],
                 }
@@ -39,24 +39,28 @@ def read_position_data():
                     counts.append(int(splits[0]))
                     times.append(float(splits[1]))
 
-            data[N]["times"].append(times)
-            data[N]["particles"] = counts
+            data[(N, d)]["times"].append(times)
+            data[(N, d)]["particles"] = counts
 
     return data
 
 
-def plot():
-    data = read_position_data()
-
+def plot(data, sufix):
     fig1 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
     plt.ylabel("Tiempo (s)")
     plt.xlabel("Particulas")
 
-    plt.plot(data[200]["particles"], data[200]["times"][0])
+    for key in data.keys():
+        plt.plot(
+            data[key]["particles"],
+            data[key]["times"][0],
+            label=f"N = {key[0]}, d = {key[1]}",
+        )
+    plt.legend()
 
-    fig1.savefig(RESULTS_PATH + "removed_times.png")
+    fig1.savefig(RESULTS_PATH + f"removed_times_{sufix}.png")
 
     fig2 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
     plt.rcParams["font.family"] = "serif"
@@ -64,19 +68,23 @@ def plot():
     plt.ylabel("Particulas")
     plt.xlabel("Tiempo (s)")
 
-    mean_times = np.mean(data[200]["times"], axis=0)
-    std_times = np.std(data[200]["times"], axis=0)
+    mean_times = {}
 
-    plt.errorbar(
-        mean_times,
-        data[200]["particles"],
-        xerr=std_times,
-        fmt="bx",
-        ecolor="r",
-        capsize=5,
-    )
+    for key in data.keys():
+        mean_times[key] = np.mean(data[key]["times"], axis=0)
+        std_times = np.std(data[key]["times"], axis=0)
+        plt.errorbar(
+            mean_times[key],
+            data[key]["particles"],
+            xerr=std_times,
+            fmt="x",
+            ecolor="r",
+            label=f"N = {key[0]}, d = {key[1]}",
+        )
 
-    fig2.savefig(RESULTS_PATH + "avergage_times.png")
+    plt.legend()
+
+    fig2.savefig(RESULTS_PATH + f"avergage_times_{sufix}.png")
 
     fig3 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
     plt.rcParams["font.family"] = "serif"
@@ -84,32 +92,67 @@ def plot():
     plt.ylabel("Caudal")
     plt.xlabel("Tiempo (s)")
 
-    Q = []
-    for time in range(int(mean_times[-1]) - DELTA_TIME):
-        start_idx = -1
-        end_idx = -1
-        for j in range(len(mean_times)):
-            if start_idx == -1 and mean_times[j] > time:
-                start_idx = j
+    Q = {}
+    for key in data.keys():
+        Q[key] = []
+        for time in range(int(mean_times[key][-1]) - DELTA_TIME):
+            start_idx = -1
+            end_idx = -1
+            for j in range(len(mean_times[key])):
+                if start_idx == -1 and mean_times[key][j] > time:
+                    start_idx = j
 
-            if mean_times[j] > time + DELTA_TIME:
-                end_idx = j - 1
-                break
+                if mean_times[key][j] > time + DELTA_TIME:
+                    end_idx = j - 1
+                    break
 
-        delta_particles = (
-            data[200]["particles"][end_idx] - data[200]["particles"][start_idx]
+            delta_particles = (
+                data[key]["particles"][end_idx] - data[key]["particles"][start_idx]
+            )
+            Q[key].append(delta_particles / DELTA_TIME)
+
+        times = [
+            i + DELTA_TIME / 2 for i in range(int(mean_times[key][-1]) - DELTA_TIME)
+        ]
+
+        plt.scatter(
+            times,
+            Q[key],
+            label=f"N = {key[0]}, d = {key[1]}",
         )
-        Q.append(delta_particles / DELTA_TIME)
 
-    times = [i + DELTA_TIME / 2 for i in range(int(mean_times[-1]) - DELTA_TIME)]
+    plt.legend()
 
-    plt.scatter(times, Q)
+    fig3.savefig(RESULTS_PATH + f"caudal_{sufix}.png")
 
-    fig3.savefig(RESULTS_PATH + "caudal.png")
+    fig4 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams.update({"font.size": 16})
+    plt.ylabel("Caudal")
+    plt.xlabel("N")
 
-    plt.show()
+    for key in data.keys():
+        q = np.array(Q[key][12:64])
+
+        plt.errorbar(
+            key[0],
+            np.mean(q),
+            yerr=np.std(q),
+            fmt="bx",
+            ecolor="r",
+        )
+
+    fig4.savefig(RESULTS_PATH + f"caudales_{sufix}.png")
 
 
 if __name__ == "__main__":
     os.makedirs(RESULTS_PATH, exist_ok=True)
-    plot()
+    data = read_position_data()
+
+    only_first = {(200, 1.2): data[200, 1.2]}
+
+    plot(only_first, "only_one")
+
+    plot(data, "all")
+
+    plt.show()
