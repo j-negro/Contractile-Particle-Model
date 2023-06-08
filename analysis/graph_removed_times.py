@@ -131,9 +131,12 @@ def plot(data, sufix):
     plt.ylabel("Caudal")
     plt.xlabel("N")
 
+    x = []
+    y = []
     for key in data.keys():
         q = np.array(Q[key][12:64])
-
+        y.append(np.mean(q))
+        x.append(key[0])
         plt.errorbar(
             key[0],
             np.mean(q),
@@ -141,6 +144,12 @@ def plot(data, sufix):
             fmt="bx",
             ecolor="r",
         )
+
+    m, b = np.polyfit(x, y, 1)
+
+    plt.plot(x, m * np.array(x) + b, label=f"{m:.3f}x + {b:.3f}")
+
+    plt.legend()
 
     fig4.savefig(RESULTS_PATH + f"caudales_{sufix}.png")
 
