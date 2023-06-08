@@ -50,7 +50,7 @@ def plot(data, sufix):
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
     plt.ylabel("Tiempo (s)")
-    plt.xlabel("Partículas")
+    plt.xlabel("Partículas que salieron del recinto")
 
     for key in data.keys():
         plt.plot(
@@ -65,7 +65,7 @@ def plot(data, sufix):
     fig2 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
-    plt.ylabel("Partículas")
+    plt.ylabel("Partículas que salieron del recinto")
     plt.xlabel("Tiempo (s)")
 
     mean_times = {}
@@ -89,7 +89,7 @@ def plot(data, sufix):
     fig3 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
-    plt.ylabel("Caudal")
+    plt.ylabel("Caudal de partículas")
     plt.xlabel("Tiempo (s)")
 
     Q = {}
@@ -128,8 +128,8 @@ def plot(data, sufix):
     fig4 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
-    plt.ylabel("Caudal")
-    plt.xlabel("N")
+    plt.ylabel("Caudal promedio")
+    plt.xlabel("Cantidad de partículas iniciales")
 
     x = []
     y = []
