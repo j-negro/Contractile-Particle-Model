@@ -17,7 +17,10 @@ pub fn output_simulation(file: &File, particles: &Vec<Particle>, target: &Target
 
     let particle_count = particles.len() + CORNERS.len() + 2;
     writeln!(writer, "{particle_count}")?;
-    writeln!(writer, "Properties=pos:R:2:velo:R:2:radius:R:1 pbc=\"F F\"",)?;
+    writeln!(
+        writer,
+        "Properties=pos:R:2:velo:R:2:radius:R:1:color:R:3 pbc=\"F F\"",
+    )?;
 
     // NOTE: Write the particles
     for particle in particles {
@@ -26,7 +29,7 @@ pub fn output_simulation(file: &File, particles: &Vec<Particle>, target: &Target
 
         writeln!(
             writer,
-            "{:.12} {:.12} {:.12} {:.12} {:.4}",
+            "{:.12} {:.12} {:.12} {:.12} {:.4} 1 1 1",
             coordinates.0,
             coordinates.1,
             velocities.0,
@@ -37,12 +40,12 @@ pub fn output_simulation(file: &File, particles: &Vec<Particle>, target: &Target
 
     // NOTE: Write the corners
     for corner in &CORNERS {
-        writeln!(writer, "{:.12} {:.12} 0 0 0.05", corner.0, corner.1)?;
+        writeln!(writer, "{:.12} {:.12} 0 0 0.05 1 1 1", corner.0, corner.1)?;
     }
 
     // NOTE: Write the target
-    writeln!(writer, "{:.12} {:.12} 0 0 0.05", target.left, 0.0)?;
-    writeln!(writer, "{:.12} {:.12} 0 0 0.05", target.right, 0.0)?;
+    writeln!(writer, "{:.12} {:.12} 0 0 0.05 1 0 0", target.left, 0.0)?;
+    writeln!(writer, "{:.12} {:.12} 0 0 0.05 1 0 0", target.right, 0.0)?;
 
     Ok(())
 }
