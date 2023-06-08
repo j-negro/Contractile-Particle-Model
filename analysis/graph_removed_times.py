@@ -129,16 +129,16 @@ def plot(data, sufix):
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
     plt.ylabel("Caudal promedio")
-    plt.xlabel("Cantidad de partículas iniciales")
+    plt.xlabel("Ancho de la puerta")
 
     x = []
     y = []
     for key in data.keys():
         q = np.array(Q[key][12:64])
         y.append(np.mean(q))
-        x.append(key[0])
+        x.append(key[1])
         plt.errorbar(
-            key[0],
+            key[1],
             np.mean(q),
             yerr=np.std(q),
             fmt="bx",
