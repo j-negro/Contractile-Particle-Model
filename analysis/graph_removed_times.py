@@ -89,7 +89,7 @@ def plot(data, sufix):
     fig3 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
-    plt.ylabel("Caudal de partículas")
+    plt.ylabel("Caudal (particulas / s)")
     plt.xlabel("Tiempo (s)")
 
     Q = {}
@@ -128,7 +128,7 @@ def plot(data, sufix):
     fig4 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
-    plt.ylabel("Caudal promedio")
+    plt.ylabel("Caudal promedio (particulas / s)")
     plt.xlabel("Ancho de la puerta")
 
     x = []
