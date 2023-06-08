@@ -50,7 +50,7 @@ def plot(data, sufix):
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
     plt.ylabel("Tiempo (s)")
-    plt.xlabel("Particulas")
+    plt.xlabel("Partículas")
 
     for key in data.keys():
         plt.plot(
@@ -65,7 +65,7 @@ def plot(data, sufix):
     fig2 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
-    plt.ylabel("Particulas")
+    plt.ylabel("Partículas")
     plt.xlabel("Tiempo (s)")
 
     mean_times = {}
