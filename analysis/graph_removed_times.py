@@ -2,6 +2,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset, zoomed_inset_axes
 
 RESULTS_PATH = "./analysis/figs/"
 
@@ -82,7 +83,44 @@ def plot(data, sufix):
             label=f"N = {key[0]}, d = {key[1]}",
         )
 
-    plt.legend()
+    plt.legend(
+        loc="lower right",
+    )
+
+    # Create inset axes object with desired zoom level
+    axin = zoomed_inset_axes(
+        plt.gca(),
+        4,
+        loc=2,
+        borderpad=2,
+    )
+
+    for key in data.keys():
+        mean_times[key] = np.mean(data[key]["times"], axis=0)
+        std_times = np.std(data[key]["times"], axis=0)
+        axin.errorbar(
+            mean_times[key],
+            data[key]["particles"],
+            xerr=std_times,
+            fmt="x",
+            ecolor="r",
+            label=f"N = {key[0]}, d = {key[1]}",
+        )
+
+    axin.set_xlim(10, 15)
+    axin.set_ylim(20, 60)
+    plt.yticks(visible=True)
+    plt.xticks(visible=True)
+
+    # Show the lines zooming in
+    mark_inset(
+        plt.gca(),
+        axin,
+        loc1=1,
+        loc2=3,
+        fc="none",
+        ec="0.5",
+    )
 
     fig2.savefig(RESULTS_PATH + f"avergage_times_{sufix}.png")
 
