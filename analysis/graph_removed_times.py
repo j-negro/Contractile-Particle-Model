@@ -1,4 +1,5 @@
 import os
+from decimal import Decimal
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -167,7 +168,7 @@ def plot(data, sufix):
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
     plt.ylabel("Caudal promedio (particulas / s)")
-    plt.xlabel("Ancho de la puerta")
+    plt.xlabel("Ancho de la puerta (m)")
 
     x = []
     y = []
@@ -185,7 +186,7 @@ def plot(data, sufix):
 
     # Linear regression
     m = (np.dot(x, y) - 4 * np.mean(x) * np.mean(y)) / (
-        np.dot(x, x) - 0.25 * np.sum(x) ** 2
+        np.dot(x, x) - 0.25 * np.square(np.sum(x))
     )
     b = np.mean(y) - m * np.mean(x)
 
@@ -194,6 +195,43 @@ def plot(data, sufix):
     plt.legend()
 
     fig4.savefig(RESULTS_PATH + f"caudales_{sufix}.png")
+
+    fig5 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams.update({"font.size": 16})
+    plt.ylabel("Error del ajuste (partículas / s)²")
+    plt.xlabel("Pendiente (partículas / m*s)")
+
+    def calculate_error(x, y, m):
+        mean_x = np.mean(x)
+        mean_y = np.mean(y)
+
+        b = mean_y - m * mean_x
+
+        error = 0
+        for point in range(len(x)):
+            error += np.square(y[point] - m * x[point] - b)
+
+        return error
+
+    m_values = np.linspace(m - 1, m + 1, 100)
+    errors = []
+    for point_m in m_values:
+        errors.append(calculate_error(x, y, point_m))
+
+    plt.plot(m_values, errors)
+
+    # Show a point in the plot with its coordinates
+    plt.plot(m, calculate_error(x, y, m), "rx")
+    plt.annotate(
+        f"({m:.3f}, {'%.2E' % Decimal(str(calculate_error(x, y, m)))})",
+        (m, calculate_error(x, y, m)),
+        textcoords="offset points",
+        xytext=(100, -10),
+        ha="center",
+    )
+
+    fig5.savefig(RESULTS_PATH + f"error_{sufix}.png")
 
 
 if __name__ == "__main__":
