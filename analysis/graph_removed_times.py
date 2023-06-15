@@ -12,7 +12,7 @@ DELTA_TIME = 5
 
 
 def read_position_data():
-    data: dict[int, dict[float, list[list[float]]]] = {}
+    data: dict[tuple[int, float], dict[str, list[list[float]]]] = {}
 
     for file in os.listdir(DIR):
         if file.endswith(".txt"):
@@ -183,7 +183,11 @@ def plot(data, sufix):
             ecolor="r",
         )
 
-    m, b = np.polyfit(x, y, 1)
+    # Linear regression
+    m = (np.dot(x, y) - 4 * np.mean(x) * np.mean(y)) / (
+        np.dot(x, x) - 0.25 * np.sum(x) ** 2
+    )
+    b = np.mean(y) - m * np.mean(x)
 
     plt.plot(x, m * np.array(x) + b, label=f"{m:.3f}x + {b:.3f}")
 
