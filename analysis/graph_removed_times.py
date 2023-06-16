@@ -1,5 +1,4 @@
 import os
-from decimal import Decimal
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -200,38 +199,65 @@ def plot(data, sufix):
     plt.rcParams["font.family"] = "serif"
     plt.rcParams.update({"font.size": 16})
     plt.ylabel("Error del ajuste (partículas / s)²")
-    plt.xlabel("Pendiente (partículas / m*s)")
+    plt.xlabel("Pendiente (partículas / (m*s))")
 
     def calculate_error(x, y, m):
         mean_x = np.mean(x)
         mean_y = np.mean(y)
 
-        b = mean_y - m * mean_x
-
         error = 0
         for point in range(len(x)):
-            error += np.square(y[point] - m * x[point] - b)
+            error += np.square(y[point] - m * x[point])
 
         return error
 
-    m_values = np.linspace(m - 1, m + 1, 100)
+    m_values = np.linspace(1.2, 2.5, 10000)
     errors = []
     for point_m in m_values:
         errors.append(calculate_error(x, y, point_m))
 
     plt.plot(m_values, errors)
 
+    m = m_values[errors.index(min(errors))]
+    error = min(errors)
+
     # Show a point in the plot with its coordinates
-    plt.plot(m, calculate_error(x, y, m), "rx")
+    plt.plot(m, error, "rx")
     plt.annotate(
-        f"({m:.3f}, {'%.2E' % Decimal(str(calculate_error(x, y, m)))})",
-        (m, calculate_error(x, y, m)),
+        f"({m:.3f}, {error:.3f})",
+        (m_values[errors.index(min(errors))], min(errors)),
         textcoords="offset points",
         xytext=(100, -10),
         ha="center",
     )
 
     fig5.savefig(RESULTS_PATH + f"error_{sufix}.png")
+
+    fig6 = plt.figure(figsize=(1280 / 108, 720 / 108), dpi=108)
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams.update({"font.size": 16})
+    plt.ylabel("Caudal promedio (particulas / s)")
+    plt.xlabel("Ancho de la puerta (m)")
+
+    for key in data.keys():
+        q = np.array(Q[key][12:64])
+        plt.errorbar(
+            key[1],
+            np.mean(q),
+            yerr=np.std(q),
+            fmt="bx",
+            ecolor="r",
+        )
+
+    plt.plot(
+        x,
+        m * np.array(x),
+        label=f"{m:.3f}x",
+    )
+
+    plt.legend()
+
+    fig6.savefig(RESULTS_PATH + f"caudales_{sufix}.png")
 
 
 if __name__ == "__main__":
