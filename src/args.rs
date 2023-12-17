@@ -10,7 +10,7 @@ pub struct Cli {
     pub output_step_count: usize,
 
     #[arg(short, long, default_value_t = 200)]
-    pub parcile_count: usize,
+    pub particle_count: usize,
 
     #[arg(short, long, default_value_t = 1.2)]
     pub target_size: f64,

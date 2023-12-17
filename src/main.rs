@@ -16,7 +16,7 @@ mod target;
 fn main() -> Result<()> {
     let args = Cli::parse();
 
-    let mut simulation = Simulation::new(args.parcile_count, args.target_size);
+    let mut simulation = Simulation::new(args.particle_count, args.target_size);
 
     let file = File::create(args.xyz_output_path)?;
     io::output_simulation(&file, &simulation.particles, &simulation.target)?;
